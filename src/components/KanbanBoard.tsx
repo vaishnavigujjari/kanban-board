@@ -17,11 +17,19 @@ import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
 
 function KanbanBoard() {
-  const [columns, setColumns] = useState<Column[]>([]);
+  const [columns, setColumns] = useState<Column[]>([
+    { id: 1, title: "To Do" },
+    { id: 2, title: "In Progress" },
+    { id: 3, title: "Completed" },
+  ]);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, columnId: 1, content: "Apply 50 jobs" },
+    { id: 2, columnId: 2, content: "Learn Prometheus" },
+    { id: 3, columnId: 3, content: "Learn Ansible" },
+  ]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -52,6 +60,9 @@ function KanbanBoard() {
                   tasks={tasks.filter((task) => task.columnId === column.id)}
                   DeleteTask={DeleteTask}
                   UpdateTask={UpdateTask}
+                  tasksSize={
+                    tasks.filter((task) => task.columnId === column.id).length
+                  }
                 />
               ))}
             </SortableContext>
@@ -77,6 +88,7 @@ function KanbanBoard() {
                 )}
                 DeleteTask={DeleteTask}
                 UpdateTask={UpdateTask}
+                tasksSize={tasks.length}
               />
             )}
             {activeTask && (
@@ -96,7 +108,7 @@ function KanbanBoard() {
   function AddColumn() {
     const columnToAdd: Column = {
       id: generateId(),
-      title: `Column ${columns.length + 1}`,
+      title: "Column Name",
     };
     setColumns([...columns, columnToAdd]);
   }
@@ -190,7 +202,7 @@ function KanbanBoard() {
     const newTask: Task = {
       id: generateId(),
       columnId,
-      content: `Task ${tasks.length + 1}`,
+      content: "Add your Task here",
     };
     setTasks([...tasks, newTask]);
   }
