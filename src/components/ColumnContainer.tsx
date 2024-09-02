@@ -14,6 +14,7 @@ interface Props {
   tasks: Task[];
   DeleteTask: (id: Id) => void;
   UpdateTask: (id: Id, content: string) => void;
+  tasksSize: number;
 }
 
 function ColumnContainer(props: Props) {
@@ -25,12 +26,13 @@ function ColumnContainer(props: Props) {
     tasks,
     DeleteTask,
     UpdateTask,
+    tasksSize,
   } = props;
   const [editMode, setEditMode] = useState(false);
   const tasksId = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
-  
+
   const {
     setNodeRef,
     attributes,
@@ -76,7 +78,7 @@ function ColumnContainer(props: Props) {
       >
         <div className="flex gap-2">
           <div className="flex justify-center items-center bg-columnBackgroundColor px-2 py-1 text-sm rounded-full">
-            0
+            {tasksSize}
           </div>
           {!editMode && column.title}
           {editMode && (
