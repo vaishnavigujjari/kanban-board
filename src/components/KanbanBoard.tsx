@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import AddIcon from "../icons/AddIcon";
-import { Column, Id } from "../types";
+import { Column, Id, Task } from "../types";
 import ColumnContainer from "./ColumnContainer";
 import {
   DndContext,
@@ -17,8 +17,9 @@ import { createPortal } from "react-dom";
 function KanbanBoard() {
   const [columns, setColumns] = useState<Column[]>([]);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
-  // eslint-disable-next-line
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -43,6 +44,10 @@ function KanbanBoard() {
                   column={column}
                   DeleteColumn={DeleteColumn}
                   UpdateColumn={UpdateColumn}
+                  CreateTask={CreateTask}
+                  tasks={tasks.filter((task) => task.columnId === column.id)}
+                  DeleteTask={DeleteTask}
+                  UpdateTask={UpdateTask}
                 />
               ))}
             </SortableContext>
@@ -62,6 +67,12 @@ function KanbanBoard() {
                 column={activeColumn}
                 DeleteColumn={DeleteColumn}
                 UpdateColumn={UpdateColumn}
+                CreateTask={CreateTask}
+                tasks={tasks.filter(
+                  (task) => task.columnId === activeColumn.id
+                )}
+                DeleteTask={DeleteTask}
+                UpdateTask={UpdateTask}
               />
             )}
           </DragOverlay>,
@@ -116,6 +127,28 @@ function KanbanBoard() {
       );
       return arrayMove(columns, activeColumnIndex, overColumnIndex);
     });
+  }
+
+  function CreateTask(columnId: Id) {
+    const newTask: Task = {
+      id: generateId(),
+      columnId,
+      content: `Task ${tasks.length + 1}`,
+    };
+    setTasks([...tasks, newTask]);
+  }
+
+  function DeleteTask(id: Id) {
+    const filteredTasks = tasks.filter((task) => task.id !== id);
+    setTasks(filteredTasks);
+  }
+
+  function UpdateTask(id: Id, content: string) {
+    const newTasks = tasks.map((task) => {
+      if (task.id !== id) return task;
+      return { ...task, content };
+    });
+    setTasks(newTasks);
   }
 }
 
